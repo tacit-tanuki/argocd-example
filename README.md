@@ -2,7 +2,7 @@
 
 ## Setup
 
-### Install related commands
+### Install required commands
 - Install the `task` command
 ```
 sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ./bin/
@@ -13,7 +13,7 @@ sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ./bin/
 source .envrc
 ```
 
-- Install `argocd`, `helmfile`, `kind`, `kubectl` commands
+- Install required commands
 ```
 task install-commands
 ```
@@ -42,15 +42,10 @@ argocd-example-cluster-control-plane   Ready    control-plane   2m24s   v1.29.2
 argocd-example-cluster-worker          Ready    <none>          2m5s    v1.29.2
 argocd-example-cluster-worker2         Ready    <none>          2m5s    v1.29.2
 argocd-example-cluster-worker3         Ready    <none>          2m3s    v1.29.2
-``
+```
 
 ### Install the ArgoCD
 ```
-❯ helm plugin install https://github.com/databus23/helm-diff
-Downloading https://github.com/databus23/helm-diff/releases/latest/download/helm-diff-linux-amd64.tgz
-Preparing to install into /home/vagrant/.local/share/helm/plugins/helm-diff
-Installed plugin: diff
-
 ❯ helmfile diff
 <omit>
 
