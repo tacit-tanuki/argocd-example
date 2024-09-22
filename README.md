@@ -46,6 +46,8 @@ argocd-example-cluster-worker3         Ready    <none>          2m3s    v1.29.2
 
 ### Install the ArgoCD
 ```
+❯ cd helmfile
+
 ❯ helmfile diff
 <omit>
 
@@ -74,4 +76,71 @@ Username: admin
 Password: <admin password>
 'admin:login' logged in successfully
 Context 'localhost:8080' updated
+```
+
+### Create and sync the ArgoCD application
+```
+❯ argocd app create guestbook --repo https://github.com/argoproj/argocd-example-apps.git --path guestbook --dest-server https://kubernetes.default.svc --dest-namespace default
+application 'guestbook' created
+
+❯ argocd app sync guestbook
+TIMESTAMP                  GROUP        KIND   NAMESPACE                  NAME    STATUS    HEALTH        HOOK  MESSAGE
+2024-09-22T21:46:18+00:00            Service     default          guestbook-ui  OutOfSync  Missing
+2024-09-22T21:46:18+00:00   apps  Deployment     default          guestbook-ui  OutOfSync  Missing
+2024-09-22T21:46:19+00:00            Service     default          guestbook-ui    Synced  Healthy
+2024-09-22T21:46:19+00:00            Service     default          guestbook-ui    Synced   Healthy              service/guestbook-ui created
+2024-09-22T21:46:19+00:00   apps  Deployment     default          guestbook-ui  OutOfSync  Missing              deployment.apps/guestbook-ui created
+2024-09-22T21:46:19+00:00   apps  Deployment     default          guestbook-ui    Synced  Progressing              deployment.apps/guestbook-ui created
+
+Name:               argocd/guestbook
+Project:            default
+Server:             https://kubernetes.default.svc
+Namespace:          default
+URL:                https://argocd.example.com/applications/guestbook
+Source:
+- Repo:             https://github.com/argoproj/argocd-example-apps.git
+  Target:
+  Path:             guestbook
+SyncWindow:         Sync Allowed
+Sync Policy:        Manual
+Sync Status:        Synced to  (d7927a2)
+Health Status:      Progressing
+
+Operation:          Sync
+Sync Revision:      d7927a27b4533926b7d86b5f249cd9ebe7625e90
+Phase:              Succeeded
+Start:              2024-09-22 21:46:18 +0000 UTC
+Finished:           2024-09-22 21:46:19 +0000 UTC
+Duration:           1s
+Message:            successfully synced (all tasks run)
+
+GROUP  KIND        NAMESPACE  NAME          STATUS  HEALTH       HOOK  MESSAGE
+       Service     default    guestbook-ui  Synced  Healthy            service/guestbook-ui created
+apps   Deployment  default    guestbook-ui  Synced  Progressing        deployment.apps/guestbook-ui created
+
+❯ argocd app list
+NAME              CLUSTER                         NAMESPACE  PROJECT  STATUS  HEALTH   SYNCPOLICY  CONDITIONS  REPO                                                 PATH       TARGET
+argocd/guestbook  https://kubernetes.default.svc  default    default  Synced  Healthy  Manual      <none>      https://github.com/argoproj/argocd-example-apps.git  guestbook
+
+❯ kubectl get all -n default
+NAME                                READY   STATUS    RESTARTS   AGE
+pod/guestbook-ui-5fbf7fddd6-46kps   1/1     Running   0          4m5s
+
+NAME                   TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+service/guestbook-ui   ClusterIP   10.96.248.40   <none>        80/TCP    4m5s
+service/kubernetes     ClusterIP   10.96.0.1      <none>        443/TCP   64m
+
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/guestbook-ui   1/1     1            1           4m5s
+
+NAME                                      DESIRED   CURRENT   READY   AGE
+replicaset.apps/guestbook-ui-5fbf7fddd6   1         1         1       4m5s
+```
+
+### Access the ArgoCD application
+```
+❯ kubectl port-forward svc/guestbook-ui --namespace default 8081:80
+
+❯ curl localhost:8081
+<omit>
 ```
