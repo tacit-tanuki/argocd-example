@@ -1,7 +1,7 @@
 # argocd-example
+This guide walks you through setting up a local Kubernetes cluster with ArgoCD for application deployment using GitOps.
 
-## Setup
-
+## Follow these steps
 ### Install required commands
 - Install the `task` command
 ```
@@ -87,3 +87,11 @@ application.argoproj.io/guestbook2 created
 ```
 
 ![multi-apps](./docs/images/multi-apps.png)
+
+#### app of apps
+```
+❯ kubectl apply -f manifests/argocd/app-of-apps/app-of-app.yaml
+application.argoproj.io/app-of-apps created
+```
+
+![app-of-apps](./docs/images/app-of-apps.png)

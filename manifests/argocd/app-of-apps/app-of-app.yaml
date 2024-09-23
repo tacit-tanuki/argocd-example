@@ -12,6 +12,6 @@ spec:
   source:
     path: manifests/argocd/app-of-apps/children/
     repoURL: https://github.com/tacit-tanuki/argocd-example
-    targetRevision: refactoring
+    targetRevision: main
   syncPolicy:
     automated: {}
