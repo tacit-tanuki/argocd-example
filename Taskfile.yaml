@@ -7,14 +7,28 @@ tasks:
       - |
         download_url='https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64'
         install_path='./bin/argocd'
-        ls $install_path >/dev/null 2>&1 && [ $? -eq 0 ] && exit 0
+        test -f $install_path && exit 0
         curl -sSL -o $install_path $download_url
         chmod 755 $install_path
+      - |
+        download_url='https://get.helm.sh/helm-v3.16.1-linux-amd64.tar.gz'
+        tmp_path='./tmp/helm.tar.gz'
+        install_path='./bin/helm'
+        test -f $install_path && exit 0
+        curl -sSL -o $tmp_path $download_url
+        tar -zxf $tmp_path -C ./tmp
+        mv ./tmp/linux-amd64/helm $install_path
+        chmod 755 $install_path
+        rm -fr ./tmp/*
+      - |
+        download_url='https://github.com/databus23/helm-diff'
+        helm diff version >/dev/null 2>&1 && exit 0
+        helm plugin install $download_url
       - |
         download_url='https://github.com/helmfile/helmfile/releases/download/v0.168.0/helmfile_0.168.0_linux_amd64.tar.gz'
         tmp_path='./tmp/helmfile.tar.gz'
         install_path='./bin/helmfile'
-        ls $install_path >/dev/null 2>&1 && [ $? -eq 0 ] && exit 0
+        test -f $install_path && exit 0
         curl -sSL -o $tmp_path $download_url
         tar -zxf ./tmp/helmfile.tar.gz -C ./tmp
         mv ./tmp/helmfile $install_path
@@ -23,27 +37,21 @@ tasks:
       - |
         download_url='https://kind.sigs.k8s.io/dl/v0.24.0/kind-linux-amd64'
         install_path='./bin/kind'
-        ls $install_path >/dev/null 2>&1 && [ $? -eq 0 ] && exit 0
+        test -f $install_path && exit 0
         curl -sSL -o $install_path $download_url
         chmod 755 $install_path
       - |
         download_url="https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         install_path='./bin/kubectl'
-        ls $install_path >/dev/null 2>&1 && [ $? -eq 0 ] && exit 0
+        test -f $install_path && exit 0
         curl -sSL -o $install_path $download_url
         chmod 755 $install_path
 
   install-commands-test:
     cmds:
       - ./bin/argocd version --client
+      - ./bin/helm version
+      - ./bin/helm diff version
       - ./bin/helmfile version
       - ./bin/kind version
       - ./bin/kubectl version
-
-  # dry-run:
-  #   cmds:
-  #     - chezmoi apply --source . --verbose --dry-run
-  # test:
-  #   cmds:
-  #     - goss validate
-  #   dir: test

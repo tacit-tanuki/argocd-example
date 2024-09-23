@@ -1,8 +1,8 @@
 # argocd-example
+This guide walks you through setting up a local Kubernetes cluster with ArgoCD for application deployment using GitOps.
 
-## Setup
-
-### Install related commands
+## Follow these steps
+### Install required commands
 - Install the `task` command
 ```
 sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ./bin/
@@ -13,7 +13,7 @@ sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ./bin/
 source .envrc
 ```
 
-- Install `argocd`, `helmfile`, `kind`, `kubectl` commands
+- Install required commands
 ```
 task install-commands
 ```
@@ -42,14 +42,11 @@ argocd-example-cluster-control-plane   Ready    control-plane   2m24s   v1.29.2
 argocd-example-cluster-worker          Ready    <none>          2m5s    v1.29.2
 argocd-example-cluster-worker2         Ready    <none>          2m5s    v1.29.2
 argocd-example-cluster-worker3         Ready    <none>          2m3s    v1.29.2
-``
+```
 
 ### Install the ArgoCD
 ```
-❯ helm plugin install https://github.com/databus23/helm-diff
-Downloading https://github.com/databus23/helm-diff/releases/latest/download/helm-diff-linux-amd64.tgz
-Preparing to install into /home/vagrant/.local/share/helm/plugins/helm-diff
-Installed plugin: diff
+❯ cd helmfile
 
 ❯ helmfile diff
 <omit>
@@ -80,3 +77,21 @@ Password: <admin password>
 'admin:login' logged in successfully
 Context 'localhost:8080' updated
 ```
+
+### Deploy the ArgoCD application
+#### multiple applications
+```
+❯ kubectl apply -f manifests/argocd/multi-apps
+application.argoproj.io/guestbook1 created
+application.argoproj.io/guestbook2 created
+```
+
+![multi-apps](./docs/images/multi-apps.png)
+
+#### app of apps
+```
+❯ kubectl apply -f manifests/argocd/app-of-apps/app-of-app.yaml
+application.argoproj.io/app-of-apps created
+```
+
+![app-of-apps](./docs/images/app-of-apps.png)
